@@ -5,7 +5,6 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,15 +12,14 @@ import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.mcbath.rebecca.beacondetectordemo.UI.MainActivity;
+
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
 import org.altbeacon.beacon.startup.BootstrapNotifier;
 import org.altbeacon.beacon.startup.RegionBootstrap;
-
-import java.util.ArrayList;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -52,18 +50,13 @@ public class BeaconApplication extends Application implements BootstrapNotifier 
 		// layout expression for other beacon types, do a web search for "setBeaconLayout"
 		// including the quotes.
 		beaconManager.getBeaconParsers().clear();
-		// Detect iBeacon:
-		beaconManager.getBeaconParsers().add(new BeaconParser(). setBeaconLayout(Utils.LAYOUT_IBEACON));
-		// Detect AltBeacon:
-		beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(Utils.LAYOUT_ALTBEACON));
-//		// Detect Eddystone (UID) frame:
-//		beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(Utils.LAYOUT_EDDYSTONE_UID));
-//		// Detect Eddystone telemetry (TLM) frame:
-//		beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(Utils.LAYOUT_EDDYSTONE_TLM));
-//		// Detect Eddystone URL frame:
-//		beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(Utils.LAYOUT_EDDYSTONE_URL));
+		beaconManager.getBeaconParsers().add(new BeaconParser("IBeacon"). setBeaconLayout(Utils.LAYOUT_IBEACON));
+		beaconManager.getBeaconParsers().add(new BeaconParser("AlBeacon").setBeaconLayout(Utils.LAYOUT_ALTBEACON));
+		beaconManager.getBeaconParsers().add(new BeaconParser("Eddystone-UID").setBeaconLayout(Utils.LAYOUT_EDDYSTONE_UID));
+		beaconManager.getBeaconParsers().add(new BeaconParser("Eddystone-TLM").setBeaconLayout(Utils.LAYOUT_EDDYSTONE_TLM));
+//		beaconManager.getBeaconParsers().add(new BeaconParser("Eddystone-URL").setBeaconLayout(Utils.LAYOUT_EDDYSTONE_URL));
 
-		beaconManager.setDebug(true);
+		BeaconManager.setDebug(true);
 
 		// Uncomment the code below to use a foreground service to scan for beacons. This unlocks
 		// the ability to continually scan for long periods of time in the background on Andorid 8+
@@ -81,11 +74,13 @@ public class BeaconApplication extends Application implements BootstrapNotifier 
 		builder.setContentIntent(pendingIntent);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			NotificationChannel channel = new NotificationChannel("My Notification Channel ID",
-					"Beacon Detection", NotificationManager.IMPORTANCE_DEFAULT);
+					"AltBeaconModel Detection", NotificationManager.IMPORTANCE_DEFAULT);
 			channel.setDescription("Scanning in the background");
 			NotificationManager notificationManager = (NotificationManager) getSystemService(
 					Context.NOTIFICATION_SERVICE);
-			notificationManager.createNotificationChannel(channel);
+			if (notificationManager != null) {
+				notificationManager.createNotificationChannel(channel);
+			}
 			builder.setChannelId(channel.getId());
 		}
 		beaconManager.enableForegroundServiceScanning(builder.build(), 456);
@@ -94,19 +89,18 @@ public class BeaconApplication extends Application implements BootstrapNotifier 
 		// JobScheduler-based scans (used on Android 8+) and set a fast background scan
 		// cycle that would otherwise be disallowed by the operating system.
 		beaconManager.setEnableScheduledScanJobs(false);
-		beaconManager.setBackgroundBetweenScanPeriod(0l);
-		beaconManager.setBackgroundScanPeriod(1100);
-		beaconManager.setForegroundBetweenScanPeriod(0l);
-		beaconManager.setForegroundScanPeriod(1100);
+		beaconManager.setBackgroundBetweenScanPeriod(1100l);
+		beaconManager.setBackgroundScanPeriod(1100l);
+		beaconManager.setForegroundBetweenScanPeriod(1100l);
+		beaconManager.setForegroundScanPeriod(1100l);
 		Log.d(TAG, "setting up background monitoring for beacons and power saving");
 
 		double scanPeriod = beaconManager.getBackgroundScanPeriod();
-		Log.d(TAG, "background scan period in Alt Beacon library is set to " + scanPeriod);
+		Log.d(TAG, "background scan period in Alt AltBeaconModel library is set to " + scanPeriod);
 
 		// wake up the app when a beacon is seen
 		Region region = new Region("backgroundRegion", null, null, null);
 
-		BeaconManager.setDebug(true);
 //		Region region1 = new Region("backgroundRegion1", Identifier.parse("9f06af5f-3b9a-4878-babc-9363e6838219"), null, null);
 //		Region region2 = new Region("backgroundRegion2", Identifier.parse("2c3b5ade-cf0f-4c3f-b49f-c857e2a077e4"), null, null);
 //		Region region3 = new Region("backgroundRegion3", Identifier.parse("07964534-ff2b-41b7-9cd1-f61634f78f54"), null, null);
@@ -121,6 +115,7 @@ public class BeaconApplication extends Application implements BootstrapNotifier 
 		// class will automatically cause the BeaconLibrary to save battery whenever the application
 		// is not visible.  This reduces bluetooth power usage by about 60%
 		backgroundPowerSaver = new BackgroundPowerSaver(this);
+		beaconManager.setBackgroundMode(true);
 
 		// If you wish to test beacon detection in the Android Emulator, you can use code like this:
 //		BeaconManager.setBeaconSimulator(new TimedBeaconSimulator() );
@@ -135,6 +130,7 @@ public class BeaconApplication extends Application implements BootstrapNotifier 
 			regionBootstrap = null;
 		}
 	}
+
 	public void enableMonitoring() {
 
 		Region region = new Region("backgroundRegion", null, null, null);
@@ -151,7 +147,7 @@ public class BeaconApplication extends Application implements BootstrapNotifier 
 
 	@Override
 	public void didEnterRegion(Region region) {
-		// In this example, this class sends a notification to the user whenever a Beacon
+		// In this example, this class sends a notification to the user whenever a AltBeaconModel
 		// matching a Region (defined above) are first seen.
 		Log.d(TAG, "did enter region.");
 

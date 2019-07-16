@@ -1,10 +1,8 @@
-package com.mcbath.rebecca.beacondetectordemo;
+package com.mcbath.rebecca.beacondetectordemo.UI;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -15,12 +13,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-import org.altbeacon.beacon.BeaconManager;
+import com.mcbath.rebecca.beacondetectordemo.BeaconApplication;
+import com.mcbath.rebecca.beacondetectordemo.R;
+import com.mcbath.rebecca.beacondetectordemo.UI.BeaconScanFragment;
 
 public class MainActivity extends AppCompatActivity {
 	private static final String TAG = "MainActivity";
 
-	private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
+	private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 
 	private BeaconApplication application;
 
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			// Android M Permission check
-			if (this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 				final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
 				builder.setTitle("This app needs location access");
 				builder.setMessage("Please grant location access so this app can detect beacons in the background.");
@@ -63,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
 					@TargetApi(23)
 					@Override
 					public void onDismiss(DialogInterface dialog) {
-						requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-								PERMISSION_REQUEST_FINE_LOCATION);
+						requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+								PERMISSION_REQUEST_COARSE_LOCATION);
 					}
 
 				});
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		switch (requestCode) {
-			case PERMISSION_REQUEST_FINE_LOCATION: {
+			case PERMISSION_REQUEST_COARSE_LOCATION: {
 				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					Log.d(TAG, "coarse location permission granted");
 				} else {
@@ -144,13 +144,14 @@ public class MainActivity extends AppCompatActivity {
 	public void onPause() {
 		super.onPause();
 		Log.d(TAG, "onPause called");
-		((BeaconApplication) this.getApplicationContext()).setMainActivity(null);
+		application.setMainActivity(null);
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		Log.d(TAG, "onDestroy called");
-		((BeaconApplication) this.getApplicationContext()).setMainActivity(null);
+		application.disableMonitoring();
+		application.setMainActivity(null);
 	}
 }

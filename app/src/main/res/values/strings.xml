@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BeaconDetectorDemo</string>
+
+    <string name="detail_adapter_viewtype_error">No matching type found</string>
 </resources>
