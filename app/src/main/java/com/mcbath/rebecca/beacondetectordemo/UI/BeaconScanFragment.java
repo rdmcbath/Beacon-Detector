@@ -173,7 +173,6 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 						if (beacon.getServiceUuid() == 0xfeaa) { // Eddystone frame uses a service Uuid of 0xfeaa
 							Log.d(TAG, "didRangeBeaconsInRegion: this is an EDDYSTONE frame");
 
-
 							EddystoneBeaconModel model = new EddystoneBeaconModel();
 
 							model.setNameSpace(String.valueOf(beacon.getId1()));
@@ -289,6 +288,7 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 		super.onResume();
 		beaconApplication.enableMonitoring();
 		beaconManager.bind(this);
+		adapter.notifyDataSetChanged();
 		Log.d(TAG, "onResume called");
 	}
 
