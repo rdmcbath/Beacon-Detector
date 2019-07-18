@@ -18,7 +18,6 @@ import com.mcbath.rebecca.beacondetectordemo.Model.BeaconTypes;
 import com.mcbath.rebecca.beacondetectordemo.Model.EddystoneBeaconModel;
 import com.mcbath.rebecca.beacondetectordemo.R;
 import com.mcbath.rebecca.beacondetectordemo.Utils;
-
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
@@ -28,7 +27,6 @@ import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -45,14 +43,13 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 	private RecyclerView rv;
 	private RecyclerView.LayoutManager layoutManager;
 	private RecyclerView.Adapter adapter;
-	private List<BeaconTypes> beaconTypesList = null;
 	private BeaconManager beaconManager;
 	private ProgressBar pb;
 	private TextView emptyView;
 	BeaconApplication beaconApplication;
 
 	public BeaconScanFragment() {
-	// Required empty public constructor
+		// Required empty public constructor
 	}
 
 	@Override
@@ -71,7 +68,7 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 			beaconManager.getBeaconParsers().add(new BeaconParser("AlBeacon").setBeaconLayout(Utils.LAYOUT_ALTBEACON));
 			beaconManager.getBeaconParsers().add(new BeaconParser("Eddystone-UID").setBeaconLayout(Utils.LAYOUT_EDDYSTONE_UID));
 			beaconManager.getBeaconParsers().add(new BeaconParser("Eddystone-TLM").setBeaconLayout(Utils.LAYOUT_EDDYSTONE_TLM));
-//			beaconManager.getBeaconParsers().add(new BeaconParser("Eddystone-URL").setBeaconLayout(Utils.LAYOUT_EDDYSTONE_URL));
+			//			beaconManager.getBeaconParsers().add(new BeaconParser("Eddystone-URL").setBeaconLayout(Utils.LAYOUT_EDDYSTONE_URL));
 
 			//Binding to the BeaconService.
 			beaconManager.bind(this);
@@ -92,7 +89,6 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 		// Setting up the layout manager to be linear
 		layoutManager = new LinearLayoutManager(getActivity());
 		rv.setLayoutManager(layoutManager);
-
 		emptyView.setVisibility(View.VISIBLE);
 		pb.setVisibility(View.VISIBLE);
 
@@ -169,49 +165,32 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 				// if AltBeaconModel is detected then size of collection is > 0
 				if (beacons.size() > 0) {
 
+					final ArrayList<BeaconTypes> beaconTypesList = new ArrayList<>();
+
 					// Iterating through collection of Beacons
 					for (Beacon beacon : beacons) {
 
 						if (beacon.getServiceUuid() == 0xfeaa) { // Eddystone frame uses a service Uuid of 0xfeaa
 							Log.d(TAG, "didRangeBeaconsInRegion: this is an EDDYSTONE frame");
 
-							final ArrayList<EddystoneBeaconModel> arrayListEd = new ArrayList<>();
+
 							EddystoneBeaconModel model = new EddystoneBeaconModel();
 
 							model.setNameSpace(String.valueOf(beacon.getId1()));
 							model.setInstanceId(String.valueOf(beacon.getId2()));
-//							model.setBluetoothName(String.valueOf(beacon.getBluetoothName()));
-//							model.setBluetoothAddress(String.valueOf(beacon.getBluetoothAddress()));
-//							model.setRssi(String.valueOf(beacon.getRssi()));
-//							model.setTxPower(String.valueOf(beacon.getTxPower()));
+							//							model.setBluetoothName(String.valueOf(beacon.getBluetoothName()));
+							//							model.setBluetoothAddress(String.valueOf(beacon.getBluetoothAddress()));
+							//							model.setRssi(String.valueOf(beacon.getRssi()));
+							//							model.setTxPower(String.valueOf(beacon.getTxPower()));
 							double distance1 = beacon.getDistance();
 							String distance = String.format(Locale.getDefault(), "%.2f", distance1);
 							model.setDistance(distance);
 
-							arrayListEd.add(model);
-
-							try {
-								getActivity().runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-
-										emptyView.setVisibility(View.GONE);
-										pb.setVisibility(View.GONE);
-
-										// Setting Up the Adapter for Recycler View
-										adapter = new Adapter(beaconTypesList, getActivity());
-										rv.setAdapter(adapter);
-										((Adapter) adapter).setBeaconTypesList(arrayListEd);
-									}
-								});
-							} catch (Exception e) {
-								Log.d(TAG, e.toString());
-							}
+							beaconTypesList.add(model);
 
 						} else { // AltBeacon or iBeacon frame
 							Log.d(TAG, "didRangeBeaconsInRegion: this is an ALTBEACON frame");
 
-							final ArrayList<AltBeaconModel> arrayListAlt = new ArrayList<>();
 							AltBeaconModel model = new AltBeaconModel();
 
 							model.setUuid(String.valueOf(beacon.getId1()));
@@ -224,41 +203,40 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 							model.setBluetoothName(String.valueOf(beacon.getBluetoothName()));
 							model.setBluetoothAddress(String.valueOf(beacon.getBluetoothAddress()));
 
-							arrayListAlt.add(model);
-
-							try {
-								getActivity().runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-
-										emptyView.setVisibility(View.GONE);
-										pb.setVisibility(View.GONE);
-
-										// Setting Up the Adapter for Recycler View
-										adapter = new Adapter(beaconTypesList, getActivity());
-										rv.setAdapter(adapter);
-										((Adapter) adapter).setBeaconTypesList(arrayListAlt);
-									}
-								});
-							} catch (Exception e) {
-								Log.d(TAG, e.toString());
-							}
+							beaconTypesList.add(model);
 						}
 
-						// if AltBeaconModel is not detected then size of collection is = 0
-						if (beacons.size() == 0) {
-							try {
-								getActivity().runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										emptyView.setVisibility(View.VISIBLE);
-										rv.setVisibility(View.GONE);
-									}
-								});
-							} catch (Exception e) {
-								Log.d(TAG, e.toString());
-							}
+						try {
+							getActivity().runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+
+									emptyView.setVisibility(View.GONE);
+									pb.setVisibility(View.GONE);
+
+									// Set the Adapter for Recycler View
+									adapter = new Adapter(beaconTypesList, getActivity());
+									rv.setAdapter(adapter);
+								}
+							});
+						} catch (Exception e) {
+							Log.d(TAG, e.toString());
 						}
+					}
+				}
+
+				// if AltBeaconModel is not detected then size of collection is = 0
+				else if (beacons.size() == 0) {
+					try {
+						getActivity().runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								emptyView.setVisibility(View.VISIBLE);
+								rv.setVisibility(View.GONE);
+							}
+						});
+					} catch (Exception e) {
+						Log.d(TAG, e.toString());
 					}
 				}
 			}
