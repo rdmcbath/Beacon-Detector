@@ -72,6 +72,6 @@ public class AltBeaconModel implements BeaconTypes {
 
 	@Override
 	public int getType() {
-		return TYPE_ALTBEACON;
+		return BeaconTypes.TYPE_ALTBEACON;
 	}
 }

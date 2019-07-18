@@ -18,7 +18,7 @@ import com.mcbath.rebecca.beacondetectordemo.R;
 import com.mcbath.rebecca.beacondetectordemo.UI.BeaconScanFragment;
 
 public class MainActivity extends AppCompatActivity {
-	private static final String TAG = "MainActivity";
+	private static final String TAG = "BeaconApp";
 
 	private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 

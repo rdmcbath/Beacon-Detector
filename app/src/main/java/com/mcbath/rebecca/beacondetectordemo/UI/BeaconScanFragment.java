@@ -40,12 +40,12 @@ import androidx.recyclerview.widget.RecyclerView;
  * on 2019-07-08.
  */
 public class BeaconScanFragment extends Fragment implements BeaconConsumer {
-	private static final String TAG = "BeaconScanFragment";
+	private static final String TAG = "BeaconApp";
 
 	private RecyclerView rv;
 	private RecyclerView.LayoutManager layoutManager;
 	private RecyclerView.Adapter adapter;
-	private List<BeaconTypes> beaconList;
+	private List<BeaconTypes> beaconTypesList = null;
 	private BeaconManager beaconManager;
 	private ProgressBar pb;
 	private TextView emptyView;
@@ -180,10 +180,10 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 
 							model.setNameSpace(String.valueOf(beacon.getId1()));
 							model.setInstanceId(String.valueOf(beacon.getId2()));
-							model.setBluetoothName(String.valueOf(beacon.getBluetoothName()));
-							model.setBluetoothAddress(String.valueOf(beacon.getBluetoothAddress()));
-							model.setRssi(String.valueOf(beacon.getRssi()));
-							model.setTxPower(String.valueOf(beacon.getTxPower()));
+//							model.setBluetoothName(String.valueOf(beacon.getBluetoothName()));
+//							model.setBluetoothAddress(String.valueOf(beacon.getBluetoothAddress()));
+//							model.setRssi(String.valueOf(beacon.getRssi()));
+//							model.setTxPower(String.valueOf(beacon.getTxPower()));
 							double distance1 = beacon.getDistance();
 							String distance = String.format(Locale.getDefault(), "%.2f", distance1);
 							model.setDistance(distance);
@@ -199,7 +199,7 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 										pb.setVisibility(View.GONE);
 
 										// Setting Up the Adapter for Recycler View
-										adapter = new Adapter(beaconList, getActivity());
+										adapter = new Adapter(beaconTypesList, getActivity());
 										rv.setAdapter(adapter);
 										((Adapter) adapter).setBeaconTypesList(arrayListEd);
 									}
@@ -235,7 +235,7 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 										pb.setVisibility(View.GONE);
 
 										// Setting Up the Adapter for Recycler View
-										adapter = new Adapter(beaconList, getActivity());
+										adapter = new Adapter(beaconTypesList, getActivity());
 										rv.setAdapter(adapter);
 										((Adapter) adapter).setBeaconTypesList(arrayListAlt);
 									}

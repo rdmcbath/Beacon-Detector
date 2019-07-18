@@ -29,7 +29,7 @@ import androidx.core.content.ContextCompat;
  * on 2019-07-08.
  */
 public class BeaconApplication extends Application implements BootstrapNotifier {
-	private static final String TAG = "BeaconApplication";
+	private static final String TAG = "BeaconApp";
 	private RegionBootstrap regionBootstrap;
 	private BackgroundPowerSaver backgroundPowerSaver;
 	private boolean haveDetectedBeaconsSinceBoot = false;

@@ -1,5 +1,7 @@
 package com.mcbath.rebecca.beacondetectordemo.Model;
 
+import org.altbeacon.beacon.Beacon;
+
 /**
  * Created by Rebecca McBath
  * on 2019-07-16.
@@ -73,7 +75,7 @@ public class EddystoneBeaconModel implements BeaconTypes {
 
 	@Override
 	public int getType() {
-		return TYPE_EDDYSTONE;
+		return BeaconTypes.TYPE_EDDYSTONE;
 	}
 
 }
