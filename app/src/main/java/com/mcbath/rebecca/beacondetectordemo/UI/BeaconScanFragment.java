@@ -97,7 +97,6 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 
 	@Override
 	public void onBeaconServiceConnect() {
-		Log.d(TAG, "onBeaconServiceConnect called");
 
 		//Constructing a new Region object to be used for Ranging or Monitoring
 		Region region = new Region("backgroundRegion", null, null, null);
@@ -171,7 +170,6 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 					for (Beacon beacon : beacons) {
 
 						if (beacon.getServiceUuid() == 0xfeaa) { // Eddystone frame uses a service Uuid of 0xfeaa
-							Log.d(TAG, "didRangeBeaconsInRegion: this is an EDDYSTONE frame");
 
 							EddystoneBeaconModel model = new EddystoneBeaconModel();
 
@@ -188,7 +186,6 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 							beaconTypesList.add(model);
 
 						} else { // AltBeacon or iBeacon frame
-							Log.d(TAG, "didRangeBeaconsInRegion: this is an ALTBEACON frame");
 
 							AltBeaconModel model = new AltBeaconModel();
 
@@ -216,6 +213,7 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 									// Set the Adapter for Recycler View
 									adapter = new Adapter(beaconTypesList, getActivity());
 									rv.setAdapter(adapter);
+									adapter.notifyDataSetChanged();
 								}
 							});
 						} catch (Exception e) {
@@ -224,7 +222,6 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 					}
 				}
 
-				// if AltBeaconModel is not detected then size of collection is = 0
 				else if (beacons.size() == 0) {
 					try {
 						getActivity().runOnUiThread(new Runnable() {
@@ -268,7 +265,6 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.d(TAG, "onDestroy called");
 		//Unbinds an Android Activity or Service to the BeaconService to avoid a leak.
 		beaconManager.unbind(this);
 		beaconApplication.disableMonitoring();
@@ -277,7 +273,6 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		Log.d(TAG, "onDestroyView called");
 		//Unbinds an Android Activity or Service to the BeaconService to avoid a leak.
 		beaconManager.unbind(this);
 		beaconApplication.disableMonitoring();
@@ -288,14 +283,11 @@ public class BeaconScanFragment extends Fragment implements BeaconConsumer {
 		super.onResume();
 		beaconApplication.enableMonitoring();
 		beaconManager.bind(this);
-		adapter.notifyDataSetChanged();
-		Log.d(TAG, "onResume called");
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		Log.d(TAG, "onPause called");
 		beaconManager.unbind(this);
 	}
 }

@@ -17,6 +17,8 @@ import com.mcbath.rebecca.beacondetectordemo.BeaconApplication;
 import com.mcbath.rebecca.beacondetectordemo.R;
 import com.mcbath.rebecca.beacondetectordemo.UI.BeaconScanFragment;
 
+import org.altbeacon.beacon.BeaconManager;
+
 public class MainActivity extends AppCompatActivity {
 	private static final String TAG = "BeaconApp";
 
@@ -29,9 +31,9 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		checkLocationPermission();
-//		verifyBluetooth();
 		initializeToolbar();
+		checkLocationPermission();
+		verifyBluetooth();
 
 		application = ((BeaconApplication) this.getApplicationContext());
 		application.setMainActivity(this);
@@ -44,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void initializeToolbar(){
-
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 	}
@@ -98,44 +99,43 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-//	private void verifyBluetooth() {
-//
-//		try {
-//			if (!BeaconManager.getInstanceForApplication(getApplicationContext()).checkAvailability()) {
-//				final AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-//				builder.setTitle("Bluetooth not enabled");
-//				builder.setMessage("Please enable bluetooth in settings and restart this application.");
-//				builder.setPositiveButton(android.R.string.ok, null);
-//				builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//					@Override
-//					public void onDismiss(DialogInterface dialog) {
-//						//finish();
-//						//System.exit(0);
-//					}
-//				});
-//				builder.show();
-//			}
-//		} catch (RuntimeException e) {
-//			final AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-//			builder.setTitle("Bluetooth LE not available");
-//			builder.setMessage("Sorry, this device does not support Bluetooth LE.");
-//			builder.setPositiveButton(android.R.string.ok, null);
-//			builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//
-//				@Override
-//				public void onDismiss(DialogInterface dialog) {
-//					//finish();
-//					//System.exit(0);
-//				}
-//			});
-//			builder.show();
-//		}
-//	}
+	private void verifyBluetooth() {
+
+		try {
+			if (!BeaconManager.getInstanceForApplication(getApplicationContext()).checkAvailability()) {
+				final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+				builder.setTitle("Bluetooth not enabled");
+				builder.setMessage("Please enable bluetooth in settings and restart this application.");
+				builder.setPositiveButton(android.R.string.ok, null);
+				builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						//finish();
+						//System.exit(0);
+					}
+				});
+				builder.show();
+			}
+		} catch (RuntimeException e) {
+			final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+			builder.setTitle("Bluetooth LE not available");
+			builder.setMessage("Sorry, this device does not support Bluetooth LE.");
+			builder.setPositiveButton(android.R.string.ok, null);
+			builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+				@Override
+				public void onDismiss(DialogInterface dialog) {
+					//finish();
+					//System.exit(0);
+				}
+			});
+			builder.show();
+		}
+	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		Log.d(TAG, "onResume called");
 		application.enableMonitoring();
 		application.setMainActivity(this);
 	}
@@ -143,14 +143,12 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		Log.d(TAG, "onPause called");
 		application.setMainActivity(null);
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.d(TAG, "onDestroy called");
 		application.disableMonitoring();
 		application.setMainActivity(null);
 	}
